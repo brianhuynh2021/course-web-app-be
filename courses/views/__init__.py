@@ -1,1 +1,1 @@
-from .course_view import CourseListView
+from .course_view import CourseListView, CourseDetailView
