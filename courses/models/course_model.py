@@ -7,7 +7,7 @@ class Course(models.Model):
     title = models.CharField(max_length=255)
     length = models.IntegerField(help_text="Duration in minutes")
     description = models.TextField()
-    cost = models.CharField(max_length=20)
+    cost = models.DecimalField(max_digits=6, decimal_places=2)
     thumbnail = models.URLField()
     created_at = models.DateTimeField(auto_now_add=True)
 
