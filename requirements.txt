@@ -1,9 +1,12 @@
 asgiref==3.8.1
 Django==4.2.20
+django-cors-headers==4.7.0
 django-filter==25.1
 djangorestframework==3.16.0
+djangorestframework_simplejwt==5.5.0
 importlib_metadata==8.6.1
 Markdown==3.7
+PyJWT==2.9.0
 sqlparse==0.5.3
 typing_extensions==4.13.0
 zipp==3.21.0
