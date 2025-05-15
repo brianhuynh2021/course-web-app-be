@@ -26,3 +26,4 @@ env/
 **/migrations/*.pyc
 **/migrations/__pycache__/
 **/migrations/*.log
+/staticfiles/
