@@ -3,13 +3,20 @@ from rest_framework.response import Response
 from courses.serializers.course_serializer import CourseSerializer
 from courses.cruds.course_crud import get_all_courses, get_course_by_id
 from rest_framework import status
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+import time
 
 
+@method_decorator(cache_page(60*5), name='dispatch')
 class CourseListView(APIView):
     def get(self, request):
         try:
+            start_time = time.time()
             courses = get_all_courses()
             serializer = CourseSerializer(courses, many=True)
+            end_time = time.time()
+            print(f"Duration {end_time - start_time:.4f}")
             return Response(serializer.data)
         except Exception as e:
             return Response(
