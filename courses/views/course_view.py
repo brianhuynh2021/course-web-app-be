@@ -3,20 +3,30 @@ from rest_framework.response import Response
 from courses.serializers.course_serializer import CourseSerializer
 from courses.cruds.course_crud import get_all_courses, get_course_by_id
 from rest_framework import status
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page
-import time
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from django.db import connection
 
-@method_decorator(cache_page(60*5), name='dispatch')
+class HealthCheckView(APIView):
+    authentication_classes = []
+    permission_classes = []
+    
+    def get(self, request):
+        result = {"server": "up", "status": "ok"}
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute('SELECT 1')
+                result["db"] = "connected"
+        except Exception as e:
+            result['db'] = "error"
+            result['status'] = "fail"
+            result['detail'] = str(e)
+        return Response(result, status=200 if result["status"] == "ok" else 500)
 class CourseListView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         try:
-            start_time = time.time()
             courses = get_all_courses()
             serializer = CourseSerializer(courses, many=True)
-            end_time = time.time()
-            print(f"Duration {end_time - start_time:.4f}")
             return Response(serializer.data)
         except Exception as e:
             return Response(
@@ -26,6 +36,7 @@ class CourseListView(APIView):
 
 
 class CourseDetailView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request, course_id):
         course = get_course_by_id(course_id)
         if course:
@@ -34,7 +45,7 @@ class CourseDetailView(APIView):
         return Response({"error": "Course not found"}, status=status.HTTP_404_NOT_FOUND)
 
 class CourseCreateView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminUser]
     
     def post(self, request):
         serializer = CourseSerializer(data=request.data)
