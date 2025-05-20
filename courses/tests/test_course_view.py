@@ -1,12 +1,18 @@
 from django.urls import reverse
-from rest_framework.test import APITestCase
+from rest_framework.test import APITestCase, APIClient
 from unittest.mock import patch
 from courses.models.course_model import Course
 from courses.serializers.course_serializer import CourseSerializer
+from django.contrib.auth.models import User
 import uuid
 
 
 class CourseDetailViewMockTest(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(username='testuser', password='12345678')
+        self.client.force_authenticate(user=self.user)
+        
     @patch("courses.views.course_view.get_course_by_id")
     def test_course_detail_success(self, mock_get_course):
         # fake course
